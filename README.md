@@ -1,50 +1,42 @@
-# Welcome to your Expo app 👋
+# SplashCrash
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+This is a minimal crash reproduction, created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
 
-## Get started
+It seems that adding `expo-dev-client` to a vanilla Expo project causes a crash in local builds due to not finding the splash screen. I'm not sure when this was introduced, but it exists in v4.0.28.
 
-1. Install dependencies
+## Reproduction steps
 
-   ```bash
-   npm install
-   ```
+1. `npm install`
+2. `npx expo prebuild`
+3. `npx expo run:ios` (This should run fine)
+4. `ctrl-c` to stop the app
+5. `npx expo run:ios` (This will crash with the error below)
 
-2. Start the app
+## Removing the crash
 
-   ```bash
-    npx expo start
-   ```
+After reproducing the crash,
 
-In the output, you'll find options to open the app in a
+1. Remove `expo-dev-client` from `package.json`
+2. `npm install`
+3. `npx expo prebuild --clean`
+4. Delete `DerivedData` (`~/Library/Developer/Xcode/DerivedData/SplashCrash*`)
+5. Delete app from simulator
+6. `npx expo run:ios` (This should now run fine multiple times in a row)
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+## Error
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
+``` bash
+[CoreFoundation] *** Terminating app due to uncaught exception 'ERR_NO_SPLASH_SCREEN', reason: 'Couln't locate neither
+'SplashScreen.storyboard' file nor 'SplashScreen.xib' file. Create one of these in the project to make
+'expo-splash-screen' work (https://github.com/expo/expo/tree/main/packages/expo-splash-screen#-configure-ios).'
+*** First throw call stack:
+(
+0   CoreFoundation                      0x00000001804b757c __exceptionPreprocess + 172
+1   libobjc.A.dylib                     0x000000018008eda8 objc_exception_throw + 72
+2   SplashCrash.debug.dylib             0x00000001039858a8 -[EXSplashScreenViewNativeProvider createSplashScreenView] +
+1588
+3   SplashCrash.debug.dylib             0x0000000103983430 -[EXSplashScreenService
+showSplashScreenFor:options:splashScreenViewProvider:successCallback:failureCallback:] + 424
+4   SplashCrash.debug.dylib             0x00000001039831e8 -[EXSplashScreenService showSplashScreenFor:options:] + 128
+5   SplashCrash.debug.dylib             0x0000000103984360 -[EXSplashS<…>
 ```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
